@@ -1,4 +1,4 @@
-import { nanoid } from '@/lib/utils'
+import { nanoid } from 'nanoid/non-secure'
 import { Chat } from '@/components/chat'
 
 export const runtime = 'edge'
