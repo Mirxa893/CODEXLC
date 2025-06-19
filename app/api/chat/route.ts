@@ -5,10 +5,6 @@ export const runtime = 'edge'
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 
 export async function POST(req: Request) {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error('OPENROUTER_API_KEY is not set')
-  }
-
   const { messages } = await req.json()
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -26,14 +22,10 @@ export async function POST(req: Request) {
     })
   })
 
-  if (!response.ok) {
-    const errText = await response.text()
-    throw new Error(`OpenRouter API error: ${response.status} - ${errText}`)
-  }
+  // 🔐 Do NOT await response.text() or do logging here in Edge runtime
 
-  // 🔐 Make sure response.body exists before using it
-  if (!response.body) {
-    throw new Error('OpenRouter returned no response body')
+  if (!response.ok || !response.body) {
+    throw new Error(`OpenRouter API failed: ${response.status}`)
   }
 
   return new StreamingTextResponse(response.body)
