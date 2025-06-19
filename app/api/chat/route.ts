@@ -3,10 +3,12 @@ import { StreamingTextResponse } from 'ai'
 export const runtime = 'nodejs'
 
 const API_KEY = process.env.OPENROUTER_API_KEY
-const REFERER = process.env.OPENROUTER_REFERER || 'https://localhost'
 const TITLE = process.env.OPENROUTER_TITLE || 'Codex by Kamran'
 
-// ✅ Debug log to check if API key is loaded
+// ✅ Hardcode the referer to match exactly what’s in OpenRouter dashboard
+const REFERER = 'https://codexlc.vercel.app'
+
+// ✅ Debug log
 console.log('🔑 API KEY CHECK:', API_KEY ? '✅ Loaded' : '❌ Missing')
 
 export async function POST() {
@@ -26,7 +28,7 @@ export async function POST() {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${API_KEY}`,
-        'HTTP-Referer': REFERER,
+        'HTTP-Referer': REFERER, // must match OpenRouter referer exactly
         'X-Title': TITLE
       },
       body: JSON.stringify({
