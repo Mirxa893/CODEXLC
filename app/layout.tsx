@@ -4,6 +4,7 @@ import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
+import { Sidebar } from '@/components/sidebar'
 
 export const metadata = {
   title: {
