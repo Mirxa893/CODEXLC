@@ -37,12 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <div className="flex flex-1">
-              <Sidebar /> {/* ✅ Now rendered */}
-              <main className="flex-1 p-4 bg-muted/50">
-                {children}
-              </main>
-            </div>
+            <main className="flex-1 p-4 bg-muted/50">
+              {children}
+            </main>
           </div>
         </Providers>
       </body>
