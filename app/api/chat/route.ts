@@ -2,52 +2,42 @@ import { StreamingTextResponse } from 'ai'
 
 export const runtime = 'nodejs'
 
-const API_KEY = process.env.OPENROUTER_API_KEY
-const TITLE = process.env.OPENROUTER_TITLE || 'Codex by Kamran'
-
-// 🔐 Use hardcoded referer that matches OpenRouter setting
-const REFERER = 'https://codexlc.vercel.app'
-
-console.log('🔑 API KEY CHECK:', API_KEY ? '✅ Loaded' : '❌ Missing')
+const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
 export async function POST() {
-  if (!API_KEY) return new Response('Missing API key', { status: 401 })
-
-  const messages = [
-    { role: 'user', content: 'Hello, who are you?' }
-  ]
+  const userMessage = 'Hello, who are you?'
 
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 29000)
 
   try {
-    console.time('OpenRouter fetch')
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    console.time('HF Space fetch')
+    const res = await fetch(SPACE_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
-        // ✅ Use Referer instead of HTTP-Referer
-        'Referer': REFERER,
-        'X-Title': TITLE
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
-        messages,
-        stream: true
-      }),
+      body: JSON.stringify({ inputs: userMessage }),
       signal: controller.signal
     })
-    console.timeEnd('OpenRouter fetch')
+    console.timeEnd('HF Space fetch')
     clearTimeout(timeout)
 
     if (!res.ok || !res.body) {
       const err = await res.text()
-      console.error(`❌ OpenRouter error ${res.status}:`, err)
+      console.error(`❌ Hugging Face Space error ${res.status}:`, err)
       return new Response(`Error ${res.status}: ${err}`, { status: res.status })
     }
 
-    return new StreamingTextResponse(res.body)
+    // If your space does not return a stream:
+    const data = await res.json()
+    return new Response(data.generated_text || data || 'No response', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' }
+    })
+
+    // If your space *does* return a stream, use:
+    // return new StreamingTextResponse(res.body)
 
   } catch (err: any) {
     clearTimeout(timeout)
