@@ -27,9 +27,10 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         }
       }
     })
+
   return (
-    <>
-      <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
+    <div className={cn('w-full', className)}>
+      <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
             <ChatList messages={messages} />
@@ -39,6 +40,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
           <EmptyScreen setInput={setInput} />
         )}
       </div>
+
       <ChatPanel
         id={id}
         isLoading={isLoading}
@@ -49,6 +51,6 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         input={input}
         setInput={setInput}
       />
-    </>
+    </div>
   )
 }
