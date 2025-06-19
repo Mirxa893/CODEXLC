@@ -1,5 +1,4 @@
-// Inspired by Chatbot-UI and modified to fit the needs of this project
-// @see https://github.com/mckaywrigley/chatbot-ui/blob/main/components/Chat/ChatMessage.tsx
+'use client'
 
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
@@ -18,6 +17,11 @@ export interface ChatMessageProps {
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
   const isUser = message.role === 'user'
 
+  const isTyping =
+    message.content.trim() === '▍' ||
+    message.content.trim() === '' ||
+    message.content.trim().endsWith('▍')
+
   return (
     <div
       className={cn(
@@ -26,6 +30,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
       )}
       {...props}
     >
+      {/* Avatar left for assistant */}
       {!isUser && (
         <div
           className={cn(
@@ -37,47 +42,58 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
         </div>
       )}
 
+      {/* Message content */}
       <div className="ml-4 flex max-w-[80%] flex-col space-y-2 overflow-hidden px-1">
-        <MemoizedReactMarkdown
-          className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
-          remarkPlugins={[remarkGfm, remarkMath]}
-          components={{
-            p({ children }) {
-              return <p className="mb-2 last:mb-0">{children}</p>
-            },
-            code({ node, inline, className, children, ...props }) {
-              if (children.length && children[0] === '▍') {
+        {/* Typing animation if AI is generating */}
+        {isTyping ? (
+          <div className="flex space-x-1 animate-pulse">
+            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.1s]" />
+            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.2s]" />
+            <span className="h-2 w-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.3s]" />
+          </div>
+        ) : (
+          <MemoizedReactMarkdown
+            className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
+            remarkPlugins={[remarkGfm, remarkMath]}
+            components={{
+              p({ children }) {
+                return <p className="mb-2 last:mb-0">{children}</p>
+              },
+              code({ node, inline, className, children, ...props }) {
+                if (children.length && children[0] === '▍') {
+                  return (
+                    <span className="mt-1 animate-pulse cursor-default">▍</span>
+                  )
+                }
+
+                const match = /language-(\w+)/.exec(className || '')
+
+                if (inline) {
+                  return (
+                    <code className={className} {...props}>
+                      {children}
+                    </code>
+                  )
+                }
+
                 return (
-                  <span className="mt-1 animate-pulse cursor-default">▍</span>
+                  <CodeBlock
+                    key={Math.random()}
+                    language={(match && match[1]) || ''}
+                    value={String(children).replace(/\n$/, '')}
+                    {...props}
+                  />
                 )
               }
-
-              const match = /language-(\w+)/.exec(className || '')
-
-              if (inline) {
-                return (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                )
-              }
-
-              return (
-                <CodeBlock
-                  key={Math.random()}
-                  language={(match && match[1]) || ''}
-                  value={String(children).replace(/\n$/, '')}
-                  {...props}
-                />
-              )
-            }
-          }}
-        >
-          {message.content}
-        </MemoizedReactMarkdown>
+            }}
+          >
+            {message.content}
+          </MemoizedReactMarkdown>
+        )}
         <ChatMessageActions message={message} />
       </div>
 
+      {/* Avatar right for user */}
       {isUser && (
         <div
           className={cn(
