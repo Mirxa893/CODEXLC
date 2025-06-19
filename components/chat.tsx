@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-  initialMessages?: Message[]  
+  initialMessages?: Message[]
   id?: string
 }
 
@@ -27,10 +27,9 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         }
       }
     })
-
   return (
     <>
-      <div className={cn('pb-[200px] pt-4 md:pt-10 md:pl-64', className)}>
+      <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
         {messages.length ? (
           <>
             <ChatList messages={messages} />
