@@ -5,10 +5,9 @@ export const runtime = 'nodejs'
 const API_KEY = process.env.OPENROUTER_API_KEY
 const TITLE = process.env.OPENROUTER_TITLE || 'Codex by Kamran'
 
-// ✅ Hardcode the referer to match exactly what’s in OpenRouter dashboard
+// 🔐 Use hardcoded referer that matches OpenRouter setting
 const REFERER = 'https://codexlc.vercel.app'
 
-// ✅ Debug log
 console.log('🔑 API KEY CHECK:', API_KEY ? '✅ Loaded' : '❌ Missing')
 
 export async function POST() {
@@ -27,8 +26,9 @@ export async function POST() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${API_KEY}`,
-        'HTTP-Referer': REFERER, // must match OpenRouter referer exactly
+        'Authorization': `Bearer ${API_KEY}`,
+        // ✅ Use Referer instead of HTTP-Referer
+        'Referer': REFERER,
         'X-Title': TITLE
       },
       body: JSON.stringify({
