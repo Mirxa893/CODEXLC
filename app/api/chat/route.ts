@@ -2,16 +2,19 @@ import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
 
-// ✅ Your Hugging Face Space backend endpoint
+// ✅ Your Hugging Face Space endpoint
 const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
 export async function POST(req: NextRequest) {
   try {
+    // ✅ Parse incoming request body
     const body = await req.json()
+    console.log('📥 Incoming body:', body)
+
     const userMessage = body?.message?.trim()
     const history = body?.history || []
 
-    // ❗ Return error if message is missing
+    // ❗ Validate message input
     if (!userMessage) {
       return new Response('⚠️ Please enter a valid message.', {
         status: 400,
@@ -19,10 +22,11 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // ✅ Abort request if it takes too long (60s)
+    // ✅ Setup timeout (60 seconds)
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 60000)
 
+    // ✅ Send POST request to your Hugging Face Space
     const res = await fetch(SPACE_URL, {
       method: 'POST',
       headers: {
@@ -37,12 +41,12 @@ export async function POST(req: NextRequest) {
 
     clearTimeout(timeout)
 
-    // ❗ Handle error responses
+    // ❗ Handle server errors
     if (!res.ok || !res.body) {
       const errText = await res.text().catch(() => '')
       console.error(`❌ HF error ${res.status}:`, errText)
       return new Response(
-        `🤖 Error ${res.status}: Server issue or timeout. Please try again.`,
+        `🤖 Error ${res.status}: HF Space unreachable or slow. Try again.`,
         {
           status: res.status,
           headers: { 'Content-Type': 'text/plain' }
@@ -50,7 +54,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ✅ Parse backend response safely
+    // ✅ Parse response safely
     const data = await res.json().catch(() => ({}))
     const reply = data?.response || '⚠️ No valid response received.'
 
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     const isTimeout = err.name === 'AbortError'
     const message = isTimeout
-      ? '⌛ Request timed out (over 60s). Please try again.'
+      ? '⌛ Timeout: Hugging Face Space took too long to respond.'
       : `❌ Unexpected error: ${err.message || 'unknown'}`
 
     return new Response(message, {
