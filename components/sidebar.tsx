@@ -9,7 +9,7 @@ export function Sidebar({ chats = [] }: { chats?: { id: string; title: string }[
 
   const handleNewChat = () => {
     const newId = Date.now().toString()
-    router.push(/chat/${newId})
+    router.push(`/chat/${newId}`) // ✅ Fixed interpolation
   }
 
   return (
@@ -22,10 +22,10 @@ export function Sidebar({ chats = [] }: { chats?: { id: string; title: string }[
         {chats.map((chat) => (
           <Link
             key={chat.id}
-            href={/chat/${chat.id}}
+            href={`/chat/${chat.id}`} // ✅ Fixed interpolation
             className="block w-full rounded p-2 hover:bg-muted"
           >
-            {chat.title || Chat ${chat.id.slice(-4)}}
+            {chat.title || `Chat ${chat.id.slice(-4)}`} {/* ✅ Fixed string */}
           </Link>
         ))}
       </div>
