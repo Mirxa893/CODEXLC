@@ -7,6 +7,9 @@ const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 export async function POST() {
   const userMessage = 'Hello, who are you?'
 
+  // ✅ Initially empty, can be extended with actual history later
+  const history: [string, string][] = []
+
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 29000)
 
@@ -17,8 +20,11 @@ export async function POST() {
       headers: {
         'Content-Type': 'application/json'
       },
-      // 🔄 Try changing message to text or prompt if needed
-      body: JSON.stringify({ message: userMessage }),
+      // ✅ Send both message and history
+      body: JSON.stringify({
+        message: userMessage,
+        history: history
+      }),
       signal: controller.signal
     })
     console.timeEnd('HF Space fetch')
@@ -33,7 +39,7 @@ export async function POST() {
     const data = await res.json()
     console.log('📦 Response Data:', data)
 
-    const reply = data.response || data.output || JSON.stringify(data)
+    const reply = data.response || JSON.stringify(data)
 
     return new Response(reply, {
       status: 200,
