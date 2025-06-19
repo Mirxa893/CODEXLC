@@ -6,8 +6,12 @@ const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const userMessage = body.message?.trim() || ''
-  const history: [string, string][] = body.history || []
+  const userMessage = body?.message?.trim()
+  const history = body?.history || []
+
+  if (!userMessage) {
+    return new Response("⚠️ Message is empty or missing", { status: 400 })
+  }
 
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 29000)
