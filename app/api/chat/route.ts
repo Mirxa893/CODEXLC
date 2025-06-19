@@ -3,8 +3,11 @@ import { StreamingTextResponse } from 'ai'
 export const runtime = 'nodejs'
 
 const API_KEY = process.env.OPENROUTER_API_KEY
-const REFERER = process.env.OPENROUTER_REFERER!
-const TITLE = process.env.OPENROUTER_TITLE!
+const REFERER = process.env.OPENROUTER_REFERER || 'https://localhost'
+const TITLE = process.env.OPENROUTER_TITLE || 'Codex by Kamran'
+
+// ✅ Debug log to check if API key is loaded
+console.log('🔑 API KEY CHECK:', API_KEY ? '✅ Loaded' : '❌ Missing')
 
 export async function POST() {
   if (!API_KEY) return new Response('Missing API key', { status: 401 })
@@ -38,7 +41,7 @@ export async function POST() {
 
     if (!res.ok || !res.body) {
       const err = await res.text()
-      console.error(`OpenRouter error ${res.status}:`, err)
+      console.error(`❌ OpenRouter error ${res.status}:`, err)
       return new Response(`Error ${res.status}: ${err}`, { status: res.status })
     }
 
@@ -46,7 +49,7 @@ export async function POST() {
 
   } catch (err: any) {
     clearTimeout(timeout)
-    console.error('Fetch error:', err)
+    console.error('❌ Fetch error:', err)
 
     const status = err.name === 'AbortError' ? 504 : 500
     return new Response(err.message, { status })
