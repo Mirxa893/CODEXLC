@@ -16,8 +16,8 @@ export async function POST(req: Request) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://codexlc.vercel.app/', // ✅ Your Vercel domain
-      'X-Title': 'Codex By KAMRAN' // ✅ App title
+      'HTTP-Referer': 'https://codexlc.vercel.app/',
+      'X-Title': 'Codex By KAMRAN'
     },
     body: JSON.stringify({
       model: 'deepseek/deepseek-chat-v3-0324:free',
@@ -26,9 +26,14 @@ export async function POST(req: Request) {
     })
   })
 
-  // Handle possible error response (optional safety)
-  if (!response.ok || !response.body) {
-    throw new Error(`OpenRouter API error: ${response.statusText}`)
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`OpenRouter API error: ${response.status} - ${errText}`)
+  }
+
+  // 🔐 Make sure response.body exists before using it
+  if (!response.body) {
+    throw new Error('OpenRouter returned no response body')
   }
 
   return new StreamingTextResponse(response.body)
