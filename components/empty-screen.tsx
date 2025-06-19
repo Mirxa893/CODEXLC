@@ -20,7 +20,7 @@ const exampleMessages = [
   {
     heading: 'Create Image',
     message: 'Enter Your Prompt: \n'
-  },
+  }
 ]
 
 export function EmptyScreen({ setInput }: Pick<UseChatHelpers, 'setInput'>) {
