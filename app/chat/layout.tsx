@@ -1,5 +1,3 @@
-// /app/chat/layout.tsx
-
 import '@/app/globals.css'
 import { Toaster } from 'react-hot-toast'
 import { fontMono, fontSans } from '@/lib/fonts'
@@ -29,14 +27,22 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={cn('font-sans antialiased', fontSans.variable, fontMono.variable)}>
+      <body
+        className={cn(
+          'font-sans antialiased',
+          fontSans.variable,
+          fontMono.variable
+        )}
+      >
         <Toaster />
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <div className="flex flex-1">
+            <div className="flex flex-1 bg-muted/50">
               <Sidebar />
-              <main className="flex-1 bg-muted/50 p-4">{children}</main>
+              <main className="flex-1 p-4 overflow-auto">
+                {children}
+              </main>
             </div>
           </div>
         </Providers>
