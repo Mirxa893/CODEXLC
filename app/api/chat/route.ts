@@ -16,15 +16,20 @@ export async function POST(req: Request) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-      'HTTP-Referer': 'https://logiqcurve.com/', // required for OpenRouter compliance
-      'X-Title': 'Codex By KAMRAN'
+      'HTTP-Referer': 'https://codexlc.vercel.app/', // ✅ Your Vercel domain
+      'X-Title': 'Codex By KAMRAN' // ✅ App title
     },
     body: JSON.stringify({
-      model: 'openai/gpt-3.5-turbo', // or other supported model
-      messages: messages,
+      model: 'deepseek/deepseek-chat-v3-0324:free',
+      messages,
       stream: true
     })
   })
 
-  return new StreamingTextResponse(response.body!)
+  // Handle possible error response (optional safety)
+  if (!response.ok || !response.body) {
+    throw new Error(`OpenRouter API error: ${response.statusText}`)
+  }
+
+  return new StreamingTextResponse(response.body)
 }
