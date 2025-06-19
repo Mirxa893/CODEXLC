@@ -1,4 +1,5 @@
-'use client'
+// Inspired by Chatbot-UI and modified to fit the needs of this project
+// @see https://github.com/mckaywrigley/chatbot-ui/blob/main/components/Chat/ChatMessage.tsx
 
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
@@ -20,28 +21,25 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
   return (
     <div
       className={cn(
-        'group relative mb-4 flex w-full',
+        'group relative mb-4 flex w-full items-start',
         isUser ? 'justify-end' : 'justify-start'
       )}
       {...props}
     >
-      {/* Icon left side for assistant */}
       {!isUser && (
-        <div className="mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md border shadow bg-primary text-primary-foreground">
+        <div
+          className={cn(
+            'flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border shadow',
+            'bg-primary text-primary-foreground'
+          )}
+        >
           <IconOpenAI />
         </div>
       )}
 
-      {/* Chat bubble */}
-      <div
-        className={cn(
-          'rounded-xl px-4 py-3 shadow-md prose dark:prose-invert break-words max-w-[80%]',
-          isUser
-            ? 'bg-primary text-white dark:bg-primary'
-            : 'bg-muted text-foreground dark:bg-muted'
-        )}
-      >
+      <div className="ml-4 flex max-w-[80%] flex-col space-y-2 overflow-hidden px-1">
         <MemoizedReactMarkdown
+          className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
           remarkPlugins={[remarkGfm, remarkMath]}
           components={{
             p({ children }) {
@@ -50,11 +48,12 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             code({ node, inline, className, children, ...props }) {
               if (children.length && children[0] === '▍') {
                 return (
-                  <span className="mt-1 animate-pulse cursor-default text-xl">▍</span>
+                  <span className="mt-1 animate-pulse cursor-default">▍</span>
                 )
               }
 
               const match = /language-(\w+)/.exec(className || '')
+
               if (inline) {
                 return (
                   <code className={className} {...props}>
@@ -79,9 +78,13 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
         <ChatMessageActions message={message} />
       </div>
 
-      {/* Icon right side for user */}
       {isUser && (
-        <div className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md border shadow bg-background">
+        <div
+          className={cn(
+            'ml-4 flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border shadow',
+            'bg-background'
+          )}
+        >
           <IconUser />
         </div>
       )}
