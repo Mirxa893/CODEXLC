@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
 
     // ❗ Validate message input
     if (!userMessage) {
-      return new Response('⚠️ Please enter a valid message.', {
+      return new Response(JSON.stringify({ response: '⚠️ Please enter a valid message.' }), {
         status: 400,
-        headers: { 'Content-Type': 'text/plain' }
+        headers: { 'Content-Type': 'application/json' }
       })
     }
 
@@ -46,10 +46,10 @@ export async function POST(req: NextRequest) {
       const errText = await res.text().catch(() => '')
       console.error(`❌ HF error ${res.status}:`, errText)
       return new Response(
-        `🤖 Error ${res.status}: HF Space unreachable or slow. Try again.`,
+        JSON.stringify({ response: `🤖 Error ${res.status}: Hugging Face Space failed.` }),
         {
           status: res.status,
-          headers: { 'Content-Type': 'text/plain' }
+          headers: { 'Content-Type': 'application/json' }
         }
       )
     }
@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
     const data = await res.json().catch(() => ({}))
     const reply = data?.response || '⚠️ No valid response received.'
 
-    return new Response(reply, {
+    return new Response(JSON.stringify({ response: reply }), {
       status: 200,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'application/json' }
     })
   } catch (err: any) {
     console.error('❌ route.ts crash:', err.message || err)
@@ -70,9 +70,9 @@ export async function POST(req: NextRequest) {
       ? '⌛ Timeout: Hugging Face Space took too long to respond.'
       : `❌ Unexpected error: ${err.message || 'unknown'}`
 
-    return new Response(message, {
+    return new Response(JSON.stringify({ response: message }), {
       status: isTimeout ? 504 : 500,
-      headers: { 'Content-Type': 'text/plain' }
+      headers: { 'Content-Type': 'application/json' }
     })
   }
 }
