@@ -1,15 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useLocalStorage } from '@/hooks/use-local-storage' // ✅ your hook path
 
-export function Sidebar({ chats = [] }: { chats?: { id: string; title: string }[] }) {
+export function Sidebar() {
   const router = useRouter()
+  const pathname = usePathname()
+
+  // ✅ Load chats from local storage
+  const [chats, setChats] = useLocalStorage<{ id: string; title: string }[]>('chat-history', [])
 
   const handleNewChat = () => {
     const newId = Date.now().toString()
-    router.push(`/chat/${newId}`) // ✅ Fixed interpolation
+    const newChat = { id: newId, title: 'New Chat' }
+    const updatedChats = [newChat, ...chats]
+    setChats(updatedChats) // ✅ Save to localStorage
+    router.push(`/chat/${newId}`)
   }
 
   return (
@@ -19,15 +28,22 @@ export function Sidebar({ chats = [] }: { chats?: { id: string; title: string }[
         ➕ New Chat
       </Button>
       <div className="space-y-2 overflow-y-auto">
-        {chats.map((chat) => (
-          <Link
-            key={chat.id}
-            href={`/chat/${chat.id}`} // ✅ Fixed interpolation
-            className="block w-full rounded p-2 hover:bg-muted"
-          >
-            {chat.title || `Chat ${chat.id.slice(-4)}`} {/* ✅ Fixed string */}
-          </Link>
-        ))}
+        {chats.length ? (
+          chats.map((chat) => (
+            <Link
+              key={chat.id}
+              href={`/chat/${chat.id}`}
+              className={cn(
+                'block w-full rounded p-2 hover:bg-muted',
+                pathname === `/chat/${chat.id}` && 'bg-muted font-semibold'
+              )}
+            >
+              {chat.title || `Chat ${chat.id.slice(-4)}`}
+            </Link>
+          ))
+        ) : (
+          <p className="text-muted-foreground text-sm">No chats yet.</p>
+        )}
       </div>
     </div>
   )
