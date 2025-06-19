@@ -7,10 +7,10 @@ import { Header } from '@/components/header'
 
 export const metadata = {
   title: {
-    default: 'LOGIQ CURVE LCC',
+    default: 'Codex Chatbot',
     template: '%s - Codex Chatbot'
   },
-  description: 'An AI chatbot built By LOGIQ CURVE LLC.',
+  description: 'An AI chatbot built with Next.js and OpenRouter.',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'white' },
     { media: '(prefers-color-scheme: dark)', color: 'black' }
@@ -37,8 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
             <Header />
-            {/* Main content area without sidebar */}
-            <main className="flex-1 overflow-y-auto p-4 bg-muted/50">
+            <main className="flex-1 p-4 bg-muted/50">
               {children}
             </main>
           </div>
