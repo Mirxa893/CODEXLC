@@ -6,7 +6,6 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { Menu } from 'lucide-react'
 
 export function Sidebar() {
   const router = useRouter()
