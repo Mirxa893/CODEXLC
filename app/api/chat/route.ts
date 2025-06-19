@@ -27,7 +27,7 @@ export async function POST() {
         'X-Title': TITLE
       },
       body: JSON.stringify({
-        model: 'openchat/openchat-3.5-1210:free',
+        model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
         messages,
         stream: true
       }),
