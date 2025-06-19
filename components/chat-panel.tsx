@@ -1,3 +1,27 @@
+'use client'
+
+import { type UseChatHelpers } from 'ai/react'
+
+import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
+import { PromptForm } from '@/components/prompt-form'
+import { Button } from '@/components/ui/button'
+import { IconRefresh, IconStop } from '@/components/ui/icons'
+
+// ✅ Props interface
+export interface ChatPanelProps
+  extends Pick<
+    UseChatHelpers,
+    | 'append'
+    | 'isLoading'
+    | 'reload'
+    | 'messages'
+    | 'stop'
+    | 'input'
+    | 'setInput'
+  > {
+  id?: string
+}
+
 export function ChatPanel({
   id,
   isLoading,
@@ -11,8 +35,7 @@ export function ChatPanel({
   return (
     <div className="fixed inset-x-0 bottom-0 bg-gradient-to-b from-muted/10 from-10% to-muted/30 to-50% z-10">
       <ButtonScrollToBottom />
-      
-      <div className="mx-auto w-full max-w-5xl px-4">
+      <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-10 items-center justify-center">
           {isLoading ? (
             <Button
