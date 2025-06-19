@@ -1,44 +1,32 @@
-import { StreamingTextResponse } from 'ai'
+// app/api/chat/route.ts
 
-export const runtime = 'nodejs'
+import { NextRequest } from 'next/server'
 
 const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
-export async function POST() {
-  const userMessage = 'Hello, who are you?'
+export async function POST(req: NextRequest) {
+  // ✅ Parse incoming request body
+  const body = await req.json()
+  const userMessage = body.message?.trim()
+  const history = body.history || []
 
-  // ✅ Initially empty, can be extended with actual history later
-  const history: [string, string][] = []
-
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 29000)
+  if (!userMessage) {
+    return new Response('⚠️ Message is required', { status: 400 })
+  }
 
   try {
-    console.time('HF Space fetch')
     const res = await fetch(SPACE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      // ✅ Send both message and history
       body: JSON.stringify({
         message: userMessage,
         history: history
-      }),
-      signal: controller.signal
+      })
     })
-    console.timeEnd('HF Space fetch')
-    clearTimeout(timeout)
-
-    if (!res.ok || !res.body) {
-      const err = await res.text()
-      console.error(`❌ Hugging Face Space error ${res.status}:`, err)
-      return new Response(`Error ${res.status}: ${err}`, { status: res.status })
-    }
 
     const data = await res.json()
-    console.log('📦 Response Data:', data)
-
     const reply = data.response || JSON.stringify(data)
 
     return new Response(reply, {
@@ -47,9 +35,6 @@ export async function POST() {
     })
 
   } catch (err: any) {
-    clearTimeout(timeout)
-    console.error('❌ Fetch error:', err)
-    const status = err.name === 'AbortError' ? 504 : 500
-    return new Response(err.message || 'Internal Server Error', { status })
+    return new Response(`❌ Error: ${err.message}`, { status: 500 })
   }
 }
