@@ -17,7 +17,8 @@ export async function POST() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ data: [userMessage] }), // ✅ change here
+      // 🔄 Try changing message to text or prompt if needed
+      body: JSON.stringify({ message: userMessage }),
       signal: controller.signal
     })
     console.timeEnd('HF Space fetch')
@@ -32,8 +33,7 @@ export async function POST() {
     const data = await res.json()
     console.log('📦 Response Data:', data)
 
-    // Most Gradio Spaces return an array like: ["response text"]
-    const reply = Array.isArray(data) ? data[0] : JSON.stringify(data)
+    const reply = data.response || data.output || JSON.stringify(data)
 
     return new Response(reply, {
       status: 200,
