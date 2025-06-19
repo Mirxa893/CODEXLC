@@ -4,6 +4,7 @@ import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
+import { Sidebar } from '@/components/sidebar' // ✅ Import your sidebar
 
 export const metadata = {
   title: {
@@ -37,9 +38,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1 p-4 bg-muted/50">
-              {children}
-            </main>
+            {/* Main layout with sidebar and content */}
+            <div className="flex flex-1 overflow-hidden">
+              {/* Sidebar - hidden on mobile, toggleable */}
+              <aside className="hidden md:block w-64 border-r bg-background">
+                <Sidebar />
+              </aside>
+
+              {/* Mobile Sidebar Toggle Button */}
+              <div className="md:hidden absolute top-16 left-0 z-50">
+                <Sidebar />
+              </div>
+
+              {/* Main content */}
+              <main className="flex-1 overflow-y-auto p-4 bg-muted/50">
+                {children}
+              </main>
+            </div>
           </div>
         </Providers>
       </body>
