@@ -2,19 +2,19 @@ import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
 
-// ✅ Your Hugging Face Space endpoint
 const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
 export async function POST(req: NextRequest) {
   try {
-    // ✅ Parse incoming request body
     const body = await req.json()
     console.log('📥 Incoming body:', body)
 
-    const userMessage = body?.message?.trim()
-    const history = body?.history || []
+    // ✅ Fix: Read from messages[]
+    const messages = body?.messages || []
+    const lastMessageObj = messages.at(-1)
+    const userMessage = lastMessageObj?.content?.trim() || ''
+    const history: [string, string][] = [] // You can later support full chat history if needed
 
-    // ❗ Validate message input
     if (!userMessage) {
       return new Response(JSON.stringify({ response: '⚠️ Please enter a valid message.' }), {
         status: 400,
@@ -22,31 +22,25 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // ✅ Setup timeout (60 seconds)
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 60000)
 
-    // ✅ Send POST request to your Hugging Face Space
     const res = await fetch(SPACE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        message: userMessage,
-        history: history
-      }),
+      body: JSON.stringify({ message: userMessage, history }),
       signal: controller.signal
     })
 
     clearTimeout(timeout)
 
-    // ❗ Handle server errors
     if (!res.ok || !res.body) {
       const errText = await res.text().catch(() => '')
       console.error(`❌ HF error ${res.status}:`, errText)
       return new Response(
-        JSON.stringify({ response: `🤖 Error ${res.status}: Hugging Face Space failed.` }),
+        JSON.stringify({ response: `🤖 Error ${res.status}: HF Space failed.` }),
         {
           status: res.status,
           headers: { 'Content-Type': 'application/json' }
@@ -54,7 +48,6 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ✅ Parse response safely
     const data = await res.json().catch(() => ({}))
     const reply = data?.response || '⚠️ No valid response received.'
 
@@ -64,7 +57,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (err: any) {
     console.error('❌ route.ts crash:', err.message || err)
-
     const isTimeout = err.name === 'AbortError'
     const message = isTimeout
       ? '⌛ Timeout: Hugging Face Space took too long to respond.'
