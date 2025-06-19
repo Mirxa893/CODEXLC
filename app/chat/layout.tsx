@@ -4,7 +4,6 @@ import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
-import { Sidebar } from '@/components/sidebar'
 
 export const metadata = {
   title: {
@@ -23,7 +22,7 @@ export const metadata = {
   }
 }
 
-export default function ChatLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
@@ -38,12 +37,9 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         <Providers attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <div className="flex flex-1 bg-muted/50">
-              <Sidebar />
-              <main className="flex-1 p-4 overflow-auto">
-                {children}
-              </main>
-            </div>
+            <main className="flex-1 p-4 bg-muted/50">
+              {children}
+            </main>
           </div>
         </Providers>
       </body>
