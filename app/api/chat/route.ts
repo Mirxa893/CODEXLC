@@ -2,26 +2,19 @@ import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
 
-// ✅ Your Hugging Face Space endpoint
 const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    console.log('📥 Incoming body:', body)
-
     const messages = body?.messages || []
     const lastMessage = messages.at(-1)?.content?.trim() || ''
-    const history: [string, string][] = [] // Add memory later if needed
+    const history: [string, string][] = []
 
     if (!lastMessage) {
-      return new Response(JSON.stringify({
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: '⚠️ Please enter a valid message.'
-      }), {
+      return new Response('⚠️ Please enter a valid message.', {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain' }
       })
     }
 
@@ -40,44 +33,29 @@ export async function POST(req: NextRequest) {
     if (!res.ok || !res.body) {
       const errText = await res.text().catch(() => '')
       console.error(`❌ HF error ${res.status}:`, errText)
-
-      return new Response(JSON.stringify({
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `🤖 Error ${res.status}: Hugging Face Space failed.`
-      }), {
+      return new Response(`🤖 Error ${res.status}: HF Space failed.`, {
         status: res.status,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'text/plain' }
       })
     }
 
     const data = await res.json().catch(() => ({}))
     const reply = data?.response || '⚠️ No valid response received.'
 
-    return new Response(JSON.stringify({
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: reply
-    }), {
+    return new Response(reply, {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/plain' }
     })
 
   } catch (err: any) {
-    console.error('❌ route.ts crash:', err.message || err)
-
     const isTimeout = err.name === 'AbortError'
     const message = isTimeout
       ? '⌛ Timeout: Hugging Face Space took too long to respond.'
       : `❌ Unexpected error: ${err.message || 'unknown'}`
 
-    return new Response(JSON.stringify({
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: message
-    }), {
+    return new Response(message, {
       status: isTimeout ? 504 : 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/plain' }
     })
   }
 }
