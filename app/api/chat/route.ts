@@ -1,26 +1,30 @@
-import { HumanloopStream } from '@/lib/humanloop-stream'
 import { StreamingTextResponse } from 'ai'
-import { HumanloopClient } from 'humanloop'
 
 export const runtime = 'edge'
 
-const HUMANLOOP_API_KEY = process.env.HUMANLOOP_API_KEY
-
-const client = new HumanloopClient({
-  apiKey: HUMANLOOP_API_KEY || ''
-})
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 
 export async function POST(req: Request) {
-  if (!HUMANLOOP_API_KEY) {
-    throw new Error('HUMANLOOP_API_KEY is not set')
+  if (!OPENROUTER_API_KEY) {
+    throw new Error('OPENROUTER_API_KEY is not set')
   }
 
   const { messages } = await req.json()
 
-  const chatResponse = await client.prompts.callStream({
-    path: 'sdk-example',
-    messages
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': 'https://logiqcurve.com/', // required for OpenRouter compliance
+      'X-Title': 'Codex By KAMRAN'
+    },
+    body: JSON.stringify({
+      model: 'openai/gpt-3.5-turbo', // or other supported model
+      messages: messages,
+      stream: true
+    })
   })
 
-  return new StreamingTextResponse(HumanloopStream(chatResponse))
+  return new StreamingTextResponse(response.body!)
 }
