@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useLocalStorage } from '@/libs/hooks/use-local-storage'
+import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 
 export function Sidebar() {
   const router = useRouter()
