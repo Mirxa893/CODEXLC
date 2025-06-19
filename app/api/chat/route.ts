@@ -1,23 +1,22 @@
-import { StreamingTextResponse } from 'ai'
+import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
 
 const SPACE_URL = 'https://mirxakamran893-LOGIQCURVECODE.hf.space/chat'
 
-export async function POST(req: Request) {
-  const body = await req.json()
-  const userMessage = body?.message?.trim()
-  const history = body?.history || []
-
-  if (!userMessage) {
-    return new Response("⚠️ Message is empty or missing", { status: 400 })
-  }
-
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 29000)
-
+export async function POST(req: NextRequest) {
   try {
-    console.time('HF Space fetch')
+    const body = await req.json()
+    const userMessage = body?.message?.trim()
+    const history = body?.history || []
+
+    if (!userMessage) {
+      return new Response('⚠️ Message is required', { status: 400 })
+    }
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 29000)
+
     const res = await fetch(SPACE_URL, {
       method: 'POST',
       headers: {
@@ -29,19 +28,17 @@ export async function POST(req: Request) {
       }),
       signal: controller.signal
     })
-    console.timeEnd('HF Space fetch')
+
     clearTimeout(timeout)
 
-    if (!res.ok || !res.body) {
-      const err = await res.text()
-      console.error(`❌ Hugging Face Space error ${res.status}:`, err)
-      return new Response(`Error ${res.status}: ${err}`, { status: res.status })
+    if (!res.ok) {
+      const errorText = await res.text()
+      console.error(`❌ HF Error ${res.status}:`, errorText)
+      return new Response(`Error ${res.status}: ${errorText}`, { status: res.status })
     }
 
     const data = await res.json()
-    console.log('📦 Response Data:', data)
-
-    const reply = data.response || JSON.stringify(data)
+    const reply = data?.response || '⚠️ No response returned.'
 
     return new Response(reply, {
       status: 200,
@@ -49,9 +46,9 @@ export async function POST(req: Request) {
     })
 
   } catch (err: any) {
-    clearTimeout(timeout)
-    console.error('❌ Fetch error:', err)
-    const status = err.name === 'AbortError' ? 504 : 500
-    return new Response(err.message || 'Internal Server Error', { status })
+    console.error('❌ route.ts error:', err.message || err)
+    return new Response(`❌ Route Error: ${err.message || 'Unknown'}`, {
+      status: 500
+    })
   }
 }
