@@ -16,7 +16,13 @@ export function ChatList({ chatId }: ChatListProps) {
         <p className="text-sm text-gray-400 text-center">No messages yet</p>
       )}
       {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
+        <ChatMessage
+          key={message.id}
+          message={{
+            ...message,
+            createdAt: new Date(message.createdAt), // ✅ fix type mismatch
+          }}
+        />
       ))}
     </div>
   )
