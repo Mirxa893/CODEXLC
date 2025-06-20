@@ -7,8 +7,6 @@ import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
 import { EmptyScreen } from '@/components/empty-screen'
 import { cn } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
-
-// ✅ optional: for saving to localStorage
 import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
@@ -38,28 +36,25 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       }
     },
     onFinish(message) {
-      // ✅ Save assistant message to localStorage
-      if (message.role === 'assistant' || message.role === 'user') {
-        addMessage({
-          role: message.role,
-          content: message.content
-        })
-      }
+      // Save assistant's response to localStorage
+      addMessage({
+        role: 'assistant',
+        content: message.content
+      })
     }
   })
 
   const { addMessage } = useChatMessages(chatId)
 
+  // Handle user input manually before sending
   const handleUserSend = async () => {
     if (!input.trim()) return
 
-    // Save to localStorage
     addMessage({
       role: 'user',
       content: input
     })
 
-    // Send to backend
     await append({
       role: 'user',
       content: input
@@ -73,7 +68,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
-            <ChatList messages={messages} /> {/* ✅ Pass directly */}
+            <ChatList messages={messages} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
@@ -85,11 +80,12 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={handleUserSend}
+        append={append} {/* ✅ pass original append */}
         reload={reload}
         messages={messages}
         input={input}
         setInput={setInput}
+        onSubmit={handleUserSend} {/* ✅ optional custom trigger */}
       />
     </div>
   )
