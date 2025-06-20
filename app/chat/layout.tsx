@@ -1,26 +1,17 @@
-import '@/app/globals.css'
+import { Sidebar } from '@/components/Sidebar' // match actual filename
+import { Header } from '@/components/header'
+import { Providers } from '@/components/providers'
 import { Toaster } from 'react-hot-toast'
+import '@/app/globals.css'
 import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
-import { Providers } from '@/components/providers'
-import { Header } from '@/components/header'
-import { Sidebar } from '@/components/Sidebar' // ✅ Make sure this exists
 
 export const metadata = {
   title: {
     default: 'Codex Chatbot',
     template: '%s - Codex Chatbot'
   },
-  description: 'An AI chatbot built with Next.js and OpenRouter.',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
-  ],
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png'
-  }
+  description: 'An AI chatbot built with Next.js and OpenRouter.'
 }
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
@@ -36,18 +27,11 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       >
         <Toaster />
         <Providers attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col md:flex-row">
-            {/* Header above everything */}
-            <Header />
-
-            {/* Sidebar + Main */}
-            <div className="flex flex-1 md:flex-row">
-              <Sidebar /> {/* ✅ Collapsible sidebar here */}
-
-              {/* Main content beside or below sidebar */}
-              <main className="flex-1 p-4 bg-muted/50">
-                {children}
-              </main>
+          <div className="flex min-h-screen md:flex-row">
+            <Sidebar />
+            <div className="flex flex-col flex-1">
+              <Header />
+              <main className="flex-1 p-4 bg-muted/50">{children}</main>
             </div>
           </div>
         </Providers>
