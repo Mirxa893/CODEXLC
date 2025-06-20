@@ -4,6 +4,7 @@ import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
+import { Sidebar } from '@/components/sidebar' // ✅ Make sure this exists
 
 export const metadata = {
   title: {
@@ -22,7 +23,7 @@ export const metadata = {
   }
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
@@ -35,11 +36,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <Toaster />
         <Providers attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen flex-col md:flex-row">
+            {/* Header above everything */}
             <Header />
-            <main className="flex-1 p-4 bg-muted/50">
-              {children}
-            </main>
+
+            {/* Sidebar + Main */}
+            <div className="flex flex-1 md:flex-row">
+              <Sidebar /> {/* ✅ Collapsible sidebar here */}
+
+              {/* Main content beside or below sidebar */}
+              <main className="flex-1 p-4 bg-muted/50">
+                {children}
+              </main>
+            </div>
           </div>
         </Providers>
       </body>
