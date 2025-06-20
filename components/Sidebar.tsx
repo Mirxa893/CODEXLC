@@ -1,27 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
 
-  const toggleSidebar = () => setIsOpen(!isOpen)
+  // Allow header to toggle it globally
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).toggleSidebar = () => setIsOpen(prev => !prev)
+    }
+  }, [])
 
   return (
     <>
-      {/* Hamburger Icon - top left */}
-      <div className="md:hidden p-4 absolute top-2 left-2 z-[10000]">
-        <button onClick={toggleSidebar} aria-label="Toggle Sidebar">
-          <svg className="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-0 left-0 z-[9999] h-full w-64 bg-gray-900 text-white p-4
+        className={`fixed top-0 left-0 z-[9999] h-full w-64 bg-gray-900 text-white p-4 pt-20
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 md:static md:block`}
@@ -34,11 +30,11 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Backdrop Overlay (mobile only) */}
+      {/* Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-[9990] md:hidden"
-          onClick={toggleSidebar}
+          onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
       )}
