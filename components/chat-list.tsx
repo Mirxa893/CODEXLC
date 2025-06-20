@@ -1,58 +1,27 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { Message } from 'ai'
 import { cn } from '@/lib/utils'
 
 interface ChatListProps {
-  currentId?: string
-  chatIds: string[]
+  messages: Message[]
 }
 
-export function ChatList({ chatIds, currentId }: ChatListProps) {
-  const [titles, setTitles] = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    const loadTitles = () => {
-      const updated: Record<string, string> = {}
-      chatIds.forEach((id) => {
-        try {
-          const raw = localStorage.getItem(id)
-          const messages = raw ? JSON.parse(raw) : []
-          const firstUserMsg = messages.find(
-            (m: any) => m.role === 'user' && m.content
-          )
-          updated[id] =
-            firstUserMsg?.content?.slice(0, 30) || 'Untitled Chat'
-        } catch {
-          updated[id] = 'Untitled Chat'
-        }
-      })
-      setTitles(updated)
-    }
-
-    loadTitles()
-
-    // Optionally: auto-refresh titles every few seconds
-    const interval = setInterval(loadTitles, 3000)
-    return () => clearInterval(interval)
-  }, [chatIds])
-
+export function ChatList({ messages }: ChatListProps) {
   return (
-    <ul className="space-y-1">
-      {chatIds.map((id) => (
-        <li key={id}>
-          <Link
-            href={`/chat/${id}`}
-            className={cn(
-              'block px-4 py-2 rounded hover:bg-muted transition',
-              currentId === id ? 'bg-muted font-bold' : ''
-            )}
-          >
-            {titles[id] || 'Loading...'}
-          </Link>
-        </li>
+    <div className="space-y-4 px-4 md:px-6">
+      {messages.map((m, idx) => (
+        <div
+          key={idx}
+          className={cn(
+            'whitespace-pre-wrap p-4 rounded-lg shadow',
+            m.role === 'user' ? 'bg-blue-100 text-black' : 'bg-gray-100 text-gray-900'
+          )}
+        >
+          <p className="text-xs font-semibold mb-1">{m.role.toUpperCase()}</p>
+          <p className="text-sm">{m.content}</p>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }
