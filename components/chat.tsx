@@ -1,7 +1,6 @@
 'use client'
 
 import { useChat, type Message } from 'ai/react'
-
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
@@ -15,25 +14,32 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
-  const { messages, append, reload, stop, isLoading, input, setInput } =
-    useChat({
-      api: '/api/chat',
-      initialMessages,
-      id,
-      body: { id },
-      onResponse(response) {
-        if (response.status !== 200) {
-          toast.error(response.statusText)
-        }
+  const {
+    messages,
+    append,
+    reload,
+    stop,
+    isLoading,
+    input,
+    setInput
+  } = useChat({
+    api: '/api/chat',
+    initialMessages,
+    id,
+    body: { id },
+    onResponse(response) {
+      if (response.status !== 200) {
+        toast.error(response.statusText)
       }
-    })
+    }
+  })
 
   return (
     <div className={cn('w-full', className)}>
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
-            <ChatList messages={messages} />
+            <ChatList messages={messages} /> {/* ✅ Pass messages directly */}
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
