@@ -1,13 +1,15 @@
 'use client'
 
 import ChatMessage from '@/components/chat-message'
-import type { Message } from 'ai'
+import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 interface ChatListProps {
-  messages: Message[]
+  chatId: string
 }
 
-export function ChatList({ messages }: ChatListProps) {
+export function ChatList({ chatId }: ChatListProps) {
+  const { messages } = useChatMessages(chatId)
+
   return (
     <div className="flex flex-col space-y-4 p-4">
       {messages.length === 0 && (
@@ -18,7 +20,7 @@ export function ChatList({ messages }: ChatListProps) {
           key={message.id}
           message={{
             ...message,
-            createdAt: new Date(message.createdAt ?? Date.now()),
+            createdAt: new Date(message.createdAt),
           }}
         />
       ))}
