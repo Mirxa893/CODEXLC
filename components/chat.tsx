@@ -48,7 +48,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   })
 
   return (
-    <div className={cn('w-full', className)}>
+    <ChatList messages={messages} />
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
