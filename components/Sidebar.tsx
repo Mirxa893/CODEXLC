@@ -6,7 +6,7 @@ import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export function Sidebar() {
   const { isOpen, closeSidebar } = useSidebar()
-  const { chats } = useChatMessages('sidebar') // Static ID just to fetch chats
+  const { chats } = useChatMessages('sidebar') // dummy chatId just to access chat history
 
   return (
     <>
