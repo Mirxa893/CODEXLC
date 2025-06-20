@@ -7,6 +7,10 @@ import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
 import { EmptyScreen } from '@/components/empty-screen'
 import { cn } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
+import { useEffect } from 'react'
+
+// ✅ your custom hook to store chat and chat-history
+import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
@@ -14,6 +18,8 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
+  const chatId = id ?? 'default-chat'
+
   const {
     messages,
     append,
@@ -25,8 +31,8 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   } = useChat({
     api: '/api/chat',
     initialMessages,
-    id,
-    body: { id },
+    id: chatId,
+    body: { id: chatId },
     onResponse(response) {
       if (response.status !== 200) {
         toast.error(response.statusText)
@@ -34,12 +40,34 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     }
   })
 
+  // ✅ local storage for chat history
+  const { addMessage } = useChatMessages(chatId)
+
+  // ✅ When user sends a message, store it in localStorage
+  const handleUserSend = async () => {
+    if (!input.trim()) return
+
+    // Save to localStorage
+    addMessage({
+      role: 'user',
+      content: input
+    })
+
+    // Send to backend
+    await append({
+      role: 'user',
+      content: input
+    })
+
+    setInput('')
+  }
+
   return (
     <div className={cn('w-full', className)}>
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
-            <ChatList messages={messages} /> {/* ✅ Pass messages directly */}
+            <ChatList chatId={chatId} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
@@ -48,10 +76,10 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       </div>
 
       <ChatPanel
-        id={id}
+        id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append}
+        append={handleUserSend} // ✅ override to call localStorage too
         reload={reload}
         messages={messages}
         input={input}
