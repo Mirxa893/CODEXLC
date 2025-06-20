@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useSidebar } from './sidebar-context'
-import { useChatHistory } from '@/lib/hooks/use-chat-history'
+import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export function Sidebar() {
   const { isOpen, closeSidebar } = useSidebar()
