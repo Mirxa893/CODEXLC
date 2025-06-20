@@ -36,11 +36,13 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       }
     },
     onFinish(message) {
-      // Save assistant's response
-      addMessage({
-        role: 'assistant',
-        content: message.content
-      })
+      // Save AI response to localStorage
+      if (message.role === 'user' || message.role === 'assistant') {
+        addMessage({
+          role: message.role,
+          content: message.content
+        })
+      }
     }
   })
 
@@ -49,15 +51,9 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   const handleUserSend = async () => {
     if (!input.trim()) return
 
-    addMessage({
-      role: 'user',
-      content: input
-    })
+    addMessage({ role: 'user', content: input })
 
-    await append({
-      role: 'user',
-      content: input
-    })
+    await append({ role: 'user', content: input })
 
     setInput('')
   }
@@ -79,12 +75,11 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append}
+        append={handleUserSend}
         reload={reload}
         messages={messages}
         input={input}
         setInput={setInput}
-        onSubmit={handleUserSend}
       />
     </div>
   )
