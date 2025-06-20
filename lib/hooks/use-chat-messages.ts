@@ -23,12 +23,14 @@ export function useChatMessages(chatId: string) {
     if (stored) {
       setMessages(JSON.parse(stored))
     }
+  }, [chatId])
 
+  useEffect(() => {
     const storedChats = localStorage.getItem('chat-history')
     if (storedChats) {
       setChats(JSON.parse(storedChats))
     }
-  }, [chatId])
+  }, [])
 
   const saveMessages = (msgs: LocalMessage[]) => {
     setMessages(msgs)
@@ -44,12 +46,11 @@ export function useChatMessages(chatId: string) {
     const updated = [...messages, newMsg]
     saveMessages(updated)
 
-    // Add to chat history if new
     const exists = chats.find(c => c.id === chatId)
-    if (!exists) {
+    if (!exists && msg.role === 'user') {
       const newChat: Chat = {
         id: chatId,
-        title: `Chat ${chats.length + 1}`
+        title: msg.content.slice(0, 30) || `Chat ${chats.length + 1}`
       }
       const updatedChats = [...chats, newChat]
       setChats(updatedChats)
