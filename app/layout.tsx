@@ -35,12 +35,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <Toaster />
         <Providers attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1 p-4 bg-muted/50">
-              {children}
-            </main>
-          </div>
+          {/* DO NOT FORCE ANY LAYOUT HERE */}
+          {children}
         </Providers>
       </body>
     </html>
