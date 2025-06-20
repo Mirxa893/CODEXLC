@@ -1,26 +1,22 @@
-import { type Message } from 'ai'
+'use client'
 
-import { Separator } from '@/components/ui/separator'
-import { ChatMessage } from '@/components/chat-message'
+import ChatMessage from '@/components/chat-message' // ✅ default import
+import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
-export interface ChatList {
-  messages: Message[]
+interface ChatListProps {
+  chatId: string
 }
 
-export function ChatList({ messages }: ChatList) {
-  if (!messages.length) {
-    return null
-  }
+export function ChatList({ chatId }: ChatListProps) {
+  const { messages } = useChatMessages(chatId)
 
   return (
-    <div className="relative mx-auto w-full max-w-5xl px-4">
-      {messages.map((message, index) => (
-        <div key={index}>
-          <ChatMessage message={message} />
-          {index < messages.length - 1 && (
-            <Separator className="my-4 md:my-8" />
-          )}
-        </div>
+    <div className="flex flex-col space-y-4 p-4">
+      {messages.length === 0 && (
+        <p className="text-sm text-gray-400 text-center">No messages yet</p>
+      )}
+      {messages.map((message) => (
+        <ChatMessage key={message.id} message={message} />
       ))}
     </div>
   )
