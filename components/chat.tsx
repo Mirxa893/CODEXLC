@@ -36,12 +36,14 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         toast.error(response.statusText)
       }
     },
-    // ✅ Hook into assistant response to store in localStorage
+    // ✅ Save assistant message to localStorage only if it's 'user' or 'assistant'
     onFinish(message) {
-      addMessage({
-        role: message.role,
-        content: message.content
-      })
+      if (message.role === 'user' || message.role === 'assistant') {
+        addMessage({
+          role: message.role,
+          content: message.content
+        })
+      }
     }
   })
 
@@ -62,7 +64,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append} // ✅ use original append function
+        append={append}
         reload={reload}
         messages={messages}
         input={input}
