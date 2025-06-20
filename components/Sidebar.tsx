@@ -1,17 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSidebar } from './sidebar-context'
 
 export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
-
-  // Allow header to toggle it globally
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).toggleSidebar = () => setIsOpen(prev => !prev)
-    }
-  }, [])
+  const { isOpen, closeSidebar } = useSidebar()
 
   return (
     <>
@@ -24,17 +17,21 @@ export function Sidebar() {
       >
         <h2 className="text-xl font-bold mb-4 text-white">All Chats</h2>
         <nav className="space-y-2">
-          <Link href="/chat/1" className="block px-4 py-2 rounded bg-gray-800 hover:bg-gray-700">
+          <Link
+            href="/chat/1"
+            className="block px-4 py-2 rounded bg-gray-800 hover:bg-gray-700"
+            onClick={closeSidebar}
+          >
             Chat 1
           </Link>
         </nav>
       </aside>
 
-      {/* Backdrop */}
+      {/* Mobile Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-[9990] md:hidden"
-          onClick={() => setIsOpen(false)}
+          onClick={closeSidebar}
           aria-hidden="true"
         />
       )}
