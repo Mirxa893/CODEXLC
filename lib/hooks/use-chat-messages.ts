@@ -30,7 +30,7 @@ export function useChatMessages(chatId: string) {
     if (storedChats) {
       setChats(JSON.parse(storedChats))
     }
-  }, [])
+  }, [chatId])
 
   const addMessage = (msg: Omit<Message, 'id' | 'createdAt'>) => {
     const newMsg: Message = {
