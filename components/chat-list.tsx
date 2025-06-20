@@ -18,7 +18,7 @@ export function ChatList({ messages }: ChatListProps) {
           key={message.id}
           message={{
             ...message,
-            createdAt: new Date(message.createdAt), // ✅ ensure type safety
+            createdAt: new Date(message.createdAt ?? Date.now()),
           }}
         />
       ))}
