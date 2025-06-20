@@ -7,7 +7,7 @@ export interface Chat {
   title: string
 }
 
-export interface Message {
+export interface LocalMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
@@ -15,54 +15,45 @@ export interface Message {
 }
 
 export function useChatMessages(chatId: string) {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<LocalMessage[]>([])
   const [chats, setChats] = useState<Chat[]>([])
 
-  // Load chat messages
   useEffect(() => {
     const stored = localStorage.getItem(`chat-${chatId}`)
     if (stored) {
       setMessages(JSON.parse(stored))
     }
-  }, [chatId])
 
-  // Load chat history
-  useEffect(() => {
     const storedChats = localStorage.getItem('chat-history')
     if (storedChats) {
       setChats(JSON.parse(storedChats))
     }
-  }, [])
+  }, [chatId])
 
-  const saveMessages = (msgs: Message[]) => {
+  const saveMessages = (msgs: LocalMessage[]) => {
     setMessages(msgs)
     localStorage.setItem(`chat-${chatId}`, JSON.stringify(msgs))
   }
 
-  const saveChats = (updatedChats: Chat[]) => {
-    setChats(updatedChats)
-    localStorage.setItem('chat-history', JSON.stringify(updatedChats))
-  }
-
-  const addMessage = (msg: Omit<Message, 'id' | 'createdAt'>) => {
-    const newMsg: Message = {
+  const addMessage = (msg: Omit<LocalMessage, 'id' | 'createdAt'>) => {
+    const newMsg: LocalMessage = {
       ...msg,
       id: Date.now().toString(),
       createdAt: Date.now()
     }
+    const updated = [...messages, newMsg]
+    saveMessages(updated)
 
-    const updatedMessages = [...messages, newMsg]
-    saveMessages(updatedMessages)
-
-    // ✅ Add chat to history if it doesn't exist
-    const chatExists = chats.some(chat => chat.id === chatId)
-    if (!chatExists) {
+    // Add to chat history if new
+    const exists = chats.find(c => c.id === chatId)
+    if (!exists) {
       const newChat: Chat = {
         id: chatId,
-        title: msg.content.slice(0, 20) || `Chat ${chats.length + 1}` // first 20 chars
+        title: `Chat ${chats.length + 1}`
       }
       const updatedChats = [...chats, newChat]
-      saveChats(updatedChats)
+      setChats(updatedChats)
+      localStorage.setItem('chat-history', JSON.stringify(updatedChats))
     }
   }
 
