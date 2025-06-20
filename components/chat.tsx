@@ -7,6 +7,8 @@ import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
 import { EmptyScreen } from '@/components/empty-screen'
 import { cn } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
+
+// ✅ optional: for saving to localStorage
 import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
@@ -16,7 +18,6 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
   const chatId = id ?? 'default-chat'
-  const { addMessage } = useChatMessages(chatId)
 
   const {
     messages,
@@ -36,9 +37,9 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         toast.error(response.statusText)
       }
     },
-    // ✅ Save assistant message to localStorage only if it's 'user' or 'assistant'
     onFinish(message) {
-      if (message.role === 'user' || message.role === 'assistant') {
+      // ✅ Save assistant message to localStorage
+      if (message.role === 'assistant' || message.role === 'user') {
         addMessage({
           role: message.role,
           content: message.content
@@ -47,12 +48,32 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     }
   })
 
+  const { addMessage } = useChatMessages(chatId)
+
+  const handleUserSend = async () => {
+    if (!input.trim()) return
+
+    // Save to localStorage
+    addMessage({
+      role: 'user',
+      content: input
+    })
+
+    // Send to backend
+    await append({
+      role: 'user',
+      content: input
+    })
+
+    setInput('')
+  }
+
   return (
-    <ChatList messages={messages} />
+    <div className={cn('w-full', className)}>
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
         {messages.length ? (
           <>
-            <ChatList chatId={chatId} />
+            <ChatList messages={messages} /> {/* ✅ Pass directly */}
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
@@ -64,7 +85,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append}
+        append={handleUserSend}
         reload={reload}
         messages={messages}
         input={input}
