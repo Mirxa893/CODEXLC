@@ -26,7 +26,7 @@ export function Sidebar() {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 md:static md:block`}
       >
-        <h2 className="text-xl font-bold mb-4 text-red-500">SIDEBAR TEST</h2>
+        <h2 className="text-xl font-bold mb-4 text-white">All Chats</h2>
         <nav className="space-y-2">
           <Link href="/chat/1" className="block px-4 py-2 rounded bg-gray-800 hover:bg-gray-700">
             Chat 1
