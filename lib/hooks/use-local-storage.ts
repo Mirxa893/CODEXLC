@@ -1,43 +1,26 @@
-import { useEffect, useState } from 'react'
+'use client'
 
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+import { useState, useEffect } from 'react'
+
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === 'undefined') return initialValue
     try {
-      const item = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null
+      const item = localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      console.error('Error reading localStorage key:', key, error)
       return initialValue
     }
   })
 
-  const setValue = (value: T) => {
-    try {
-      setStoredValue(value)
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(value))
-      }
-    } catch (error) {
-      console.error('Error setting localStorage key:', key, error)
-    }
-  }
-
   useEffect(() => {
-    // Sync localStorage changes across tabs/windows
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === key) {
-        try {
-          const newValue = event.newValue ? JSON.parse(event.newValue) : initialValue
-          setStoredValue(newValue)
-        } catch {
-          setStoredValue(initialValue)
-        }
-      }
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(key, JSON.stringify(value))
+    } catch (error) {
+      console.error('Error saving to localStorage', error)
     }
+  }, [key, value])
 
-    window.addEventListener('storage', handleStorage)
-    return () => window.removeEventListener('storage', handleStorage)
-  }, [key, initialValue])
-
-  return [storedValue, setValue]
+  return [value, setValue] as const
 }
