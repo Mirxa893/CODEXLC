@@ -7,7 +7,7 @@ export interface Chat {
   title: string
 }
 
-export interface LocalMessage {
+export interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
@@ -15,7 +15,7 @@ export interface LocalMessage {
 }
 
 export function useChatMessages(chatId: string) {
-  const [messages, setMessages] = useState<LocalMessage[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [chats, setChats] = useState<Chat[]>([])
 
   useEffect(() => {
@@ -32,27 +32,25 @@ export function useChatMessages(chatId: string) {
     }
   }, [])
 
-  const saveMessages = (msgs: LocalMessage[]) => {
-    setMessages(msgs)
-    localStorage.setItem(`chat-${chatId}`, JSON.stringify(msgs))
-  }
-
-  const addMessage = (msg: Omit<LocalMessage, 'id' | 'createdAt'>) => {
-    const newMsg: LocalMessage = {
+  const addMessage = (msg: Omit<Message, 'id' | 'createdAt'>) => {
+    const newMsg: Message = {
       ...msg,
       id: Date.now().toString(),
       createdAt: Date.now()
     }
     const updated = [...messages, newMsg]
-    saveMessages(updated)
+    setMessages(updated)
+    localStorage.setItem(`chat-${chatId}`, JSON.stringify(updated))
 
-    const exists = chats.find(c => c.id === chatId)
-    if (!exists && msg.role === 'user') {
+    const stored = localStorage.getItem('chat-history')
+    const currentChats: Chat[] = stored ? JSON.parse(stored) : []
+    const exists = currentChats.find(c => c.id === chatId)
+    if (!exists) {
       const newChat: Chat = {
         id: chatId,
-        title: msg.content.slice(0, 30) || `Chat ${chats.length + 1}`
+        title: msg.content.slice(0, 30) || `Chat ${currentChats.length + 1}`
       }
-      const updatedChats = [...chats, newChat]
+      const updatedChats = [...currentChats, newChat]
       setChats(updatedChats)
       localStorage.setItem('chat-history', JSON.stringify(updatedChats))
     }
