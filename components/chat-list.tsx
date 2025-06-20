@@ -1,6 +1,6 @@
 'use client'
 
-import ChatMessage from '@/components/chat-message' // Make sure this is default export
+import ChatMessage from '@/components/chat-message'
 import { type Message } from 'ai'
 
 interface ChatListProps {
@@ -18,7 +18,9 @@ export function ChatList({ messages }: ChatListProps) {
             key={message.id}
             message={{
               ...message,
-              createdAt: new Date(message.createdAt), // optional safety if type mismatches
+              createdAt: message.createdAt
+                ? new Date(message.createdAt)
+                : new Date(), // fallback to now if undefined
             }}
           />
         ))
