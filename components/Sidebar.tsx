@@ -1,12 +1,24 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSidebar } from './sidebar-context'
-import { useChatMessages } from '@/lib/hooks/use-chat-messages'
+
+interface Chat {
+  id: string
+  title: string
+}
 
 export function Sidebar() {
   const { isOpen, closeSidebar } = useSidebar()
-  const { chats } = useChatMessages('sidebar') // dummy chatId just to access chat history
+  const [chats, setChats] = useState<Chat[]>([])
+
+  useEffect(() => {
+    const storedChats = localStorage.getItem('chat-history')
+    if (storedChats) {
+      setChats(JSON.parse(storedChats))
+    }
+  }, [])
 
   return (
     <>
