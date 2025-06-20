@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useChat, type Message } from 'ai/react'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
@@ -18,6 +19,11 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   const chatId = id ?? 'default-chat'
   const { addMessage } = useChatMessages(chatId)
 
+  // Try loading messages from localStorage
+  const savedMessages =
+    typeof window !== 'undefined' ? localStorage.getItem(chatId) : null
+  const parsedMessages = savedMessages ? JSON.parse(savedMessages) : undefined
+
   const {
     messages,
     append,
@@ -28,7 +34,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     setInput
   } = useChat({
     api: '/api/chat',
-    initialMessages,
+    initialMessages: initialMessages?.length ? initialMessages : parsedMessages,
     id: chatId,
     body: { id: chatId },
     onResponse(response) {
@@ -37,28 +43,31 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       }
     },
     onFinish(message) {
-      if (message.role === 'user' || message.role === 'assistant') {
-        addMessage({
-          role: message.role,
-          content: message.content
-        })
-      }
+      const updatedMessages = [...messages, message]
+      localStorage.setItem(chatId, JSON.stringify(updatedMessages))
+    },
+    onError(error) {
+      toast.error(error.message)
     }
   })
 
-  return (
-    <div className={cn('w-full', className)}>
-      <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
-        {messages.length ? (
-          <>
-            <ChatList messages={messages} />
-            <ChatScrollAnchor trackVisibility={isLoading} />
-          </>
-        ) : (
-          <EmptyScreen setInput={setInput} />
-        )}
-      </div>
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(chatId, JSON.stringify(messages))
+    }
+  }, [messages, chatId])
 
+  return (
+    <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
+      {messages.length ? (
+        <>
+          <ChatList messages={messages} />
+          <ChatScrollAnchor trackVisibility={isLoading} />
+        </>
+      ) : (
+        <EmptyScreen setInput={setInput} />
+      )}
       <ChatPanel
         id={chatId}
         isLoading={isLoading}
