@@ -6,7 +6,7 @@ import { useChatMessages } from '@/lib/hooks/use-chat-messages'
 
 export function Sidebar() {
   const { isOpen, closeSidebar } = useSidebar()
-  const { Message } = useChatMessages()
+  const { chats } = useChatMessages()
 
   return (
     <>
