@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
+export interface Chat {
+  id: string
+  title: string
+}
+
 export interface Message {
   id: string
   role: 'user' | 'assistant'
@@ -11,13 +16,23 @@ export interface Message {
 
 export function useChatMessages(chatId: string) {
   const [messages, setMessages] = useState<Message[]>([])
+  const [chats, setChats] = useState<Chat[]>([])
 
+  // Load chat messages
   useEffect(() => {
     const stored = localStorage.getItem(`chat-${chatId}`)
     if (stored) {
       setMessages(JSON.parse(stored))
     }
   }, [chatId])
+
+  // Load chat history
+  useEffect(() => {
+    const storedChats = localStorage.getItem('chat-history')
+    if (storedChats) {
+      setChats(JSON.parse(storedChats))
+    }
+  }, [])
 
   const saveMessages = (msgs: Message[]) => {
     setMessages(msgs)
@@ -32,6 +47,18 @@ export function useChatMessages(chatId: string) {
     }
     const updated = [...messages, newMsg]
     saveMessages(updated)
+
+    // Auto-save chat to history if not exists
+    const exists = chats.find(c => c.id === chatId)
+    if (!exists) {
+      const newChat: Chat = {
+        id: chatId,
+        title: `Chat ${chats.length + 1}`
+      }
+      const updatedChats = [...chats, newChat]
+      setChats(updatedChats)
+      localStorage.setItem('chat-history', JSON.stringify(updatedChats))
+    }
   }
 
   const clearMessages = () => {
@@ -39,5 +66,5 @@ export function useChatMessages(chatId: string) {
     setMessages([])
   }
 
-  return { messages, addMessage, clearMessages }
+  return { messages, chats, addMessage, clearMessages }
 }
