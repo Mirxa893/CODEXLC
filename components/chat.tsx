@@ -16,7 +16,6 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
   const chatId = id ?? 'default-chat'
-
   const { addMessage } = useChatMessages(chatId)
 
   const {
@@ -38,7 +37,6 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       }
     },
     onFinish(message) {
-      // Save AI message to localStorage
       if (message.role === 'user' || message.role === 'assistant') {
         addMessage({
           role: message.role,
@@ -65,7 +63,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append} // ✅ Use built-in append
+        append={append}
         reload={reload}
         messages={messages}
         input={input}
