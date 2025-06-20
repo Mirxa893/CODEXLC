@@ -8,6 +8,7 @@ import { EmptyScreen } from '@/components/empty-screen'
 import { cn } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
 import { useChatMessages } from '@/lib/hooks/use-chat-messages'
+import { useEffect } from 'react'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
@@ -46,6 +47,17 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     }
   })
 
+  // Save user message before sending
+  const handleUserSend = async () => {
+    if (!input.trim()) return
+
+    // Save user message
+    addMessage({ role: 'user', content: input })
+
+    await append({ role: 'user', content: input })
+    setInput('')
+  }
+
   return (
     <div className={cn('w-full', className)}>
       <div className="mx-auto w-full max-w-5xl px-4 pb-[200px] pt-4 md:pt-10">
@@ -63,7 +75,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append}
+        append={handleUserSend}
         reload={reload}
         messages={messages}
         input={input}
