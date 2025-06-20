@@ -9,7 +9,7 @@ export default function NewChatPage() {
 
   useEffect(() => {
     const newId = uuid()
-    router.replace(`/chat/${newId}`)
+    router.push(`/chat/${newId}`)
   }, [router])
 
   return null
