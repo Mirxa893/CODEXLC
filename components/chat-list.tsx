@@ -1,9 +1,9 @@
 'use client'
 
 import ChatMessage from '@/components/chat-message'
-import { Message } from 'ai'
+import { Message } from 'ai/react'
 
-interface ChatListProps {
+export interface ChatListProps {
   messages: Message[]
 }
 
@@ -14,7 +14,10 @@ export function ChatList({ messages }: ChatListProps) {
         <p className="text-sm text-gray-400 text-center">No messages yet</p>
       )}
       {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
+        <ChatMessage
+          key={message.id}
+          message={message}
+        />
       ))}
     </div>
   )
