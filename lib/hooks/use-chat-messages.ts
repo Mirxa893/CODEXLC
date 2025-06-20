@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -19,7 +18,7 @@ export function useChatMessages(chatId: string) {
   const [messages, setMessages] = useState<Message[]>([])
   const [chats, setChats] = useState<Chat[]>([])
 
-  // Load messages for this chat
+  // Load chat messages
   useEffect(() => {
     const stored = localStorage.getItem(`chat-${chatId}`)
     if (stored) {
@@ -27,7 +26,7 @@ export function useChatMessages(chatId: string) {
     }
   }, [chatId])
 
-  // Load all chat history
+  // Load chat history
   useEffect(() => {
     const storedChats = localStorage.getItem('chat-history')
     if (storedChats) {
@@ -40,25 +39,30 @@ export function useChatMessages(chatId: string) {
     localStorage.setItem(`chat-${chatId}`, JSON.stringify(msgs))
   }
 
+  const saveChats = (updatedChats: Chat[]) => {
+    setChats(updatedChats)
+    localStorage.setItem('chat-history', JSON.stringify(updatedChats))
+  }
+
   const addMessage = (msg: Omit<Message, 'id' | 'createdAt'>) => {
     const newMsg: Message = {
       ...msg,
       id: Date.now().toString(),
       createdAt: Date.now()
     }
-    const updated = [...messages, newMsg]
-    saveMessages(updated)
 
-    // Save this chat in chat history if not exists
-    const exists = chats.find(c => c.id === chatId)
-    if (!exists) {
+    const updatedMessages = [...messages, newMsg]
+    saveMessages(updatedMessages)
+
+    // ✅ Add chat to history if it doesn't exist
+    const chatExists = chats.some(chat => chat.id === chatId)
+    if (!chatExists) {
       const newChat: Chat = {
         id: chatId,
-        title: `Chat ${chats.length + 1}`
+        title: msg.content.slice(0, 20) || `Chat ${chats.length + 1}` // first 20 chars
       }
       const updatedChats = [...chats, newChat]
-      setChats(updatedChats)
-      localStorage.setItem('chat-history', JSON.stringify(updatedChats))
+      saveChats(updatedChats)
     }
   }
 
