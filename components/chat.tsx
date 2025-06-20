@@ -36,7 +36,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       }
     },
     onFinish(message) {
-      // Save assistant's response to localStorage
+      // Save assistant's response
       addMessage({
         role: 'assistant',
         content: message.content
@@ -46,7 +46,6 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
 
   const { addMessage } = useChatMessages(chatId)
 
-  // Handle user input manually before sending
   const handleUserSend = async () => {
     if (!input.trim()) return
 
@@ -80,12 +79,12 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         id={chatId}
         isLoading={isLoading}
         stop={stop}
-        append={append} {/* ✅ pass original append */}
+        append={append}
         reload={reload}
         messages={messages}
         input={input}
         setInput={setInput}
-        onSubmit={handleUserSend} {/* ✅ optional custom trigger */}
+        onSubmit={handleUserSend}
       />
     </div>
   )
