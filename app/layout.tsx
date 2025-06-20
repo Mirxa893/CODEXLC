@@ -10,33 +10,20 @@ export const metadata = {
     default: 'Codex Chatbot',
     template: '%s - Codex Chatbot'
   },
-  description: 'An AI chatbot built with Next.js and OpenRouter.',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
-  ],
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png'
-  }
+  description: 'An AI chatbot built with Next.js and OpenRouter.'
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body
-        className={cn(
-          'font-sans antialiased',
-          fontSans.variable,
-          fontMono.variable
-        )}
-      >
+      <body className={cn('font-sans antialiased', fontSans.variable, fontMono.variable)}>
         <Toaster />
         <Providers attribute="class" defaultTheme="system" enableSystem>
-          {/* DO NOT FORCE ANY LAYOUT HERE */}
-          {children}
+          <div className="min-h-screen flex flex-col">
+            <Header /> {/* ✅ Global header here */}
+            <div className="flex-1">{children}</div> {/* Let /chat manage its own sidebar layout */}
+          </div>
         </Providers>
       </body>
     </html>
