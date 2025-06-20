@@ -1,28 +1,23 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { IconGitHub } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 import { NewChatButton } from './new-chat-button'
 import { ThemeToggle } from './theme-toggle'
+import { useSidebar } from './sidebar-context' // ✅ Import context
 
 export function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Optional: expose state to Sidebar if needed later
-  if (typeof window !== 'undefined') {
-    (window as any).toggleSidebar = () => setSidebarOpen(prev => !prev)
-  }
+  const { toggleSidebar } = useSidebar() // ✅ Access toggle from context
 
   return (
     <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center justify-between border-b bg-background px-4 backdrop-blur-xl">
-      {/* LEFT SECTION: Logo + Hamburger */}
+      {/* Left section: Hamburger + Logo */}
       <div className="flex items-center space-x-2">
-        {/* Hamburger: visible only on mobile */}
+        {/* Hamburger: mobile only */}
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={toggleSidebar}
           className="md:hidden focus:outline-none"
           aria-label="Toggle sidebar"
         >
@@ -37,10 +32,10 @@ export function Header() {
         </Link>
       </div>
 
-      {/* CENTER: New Chat */}
+      {/* Center: New chat button */}
       <NewChatButton />
 
-      {/* RIGHT: Theme + GitHub */}
+      {/* Right section */}
       <div className="flex items-center space-x-2">
         <ThemeToggle />
         <a
