@@ -1,4 +1,4 @@
-import { useLocalStorage } from './use-local-storage'
+import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 
 export interface Chat {
   id: string
