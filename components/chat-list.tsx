@@ -1,24 +1,58 @@
 'use client'
 
-import ChatMessage from '@/components/chat-message'
-import { Message } from 'ai/react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 
-export interface ChatListProps {
-  messages: Message[]
+interface ChatListProps {
+  currentId?: string
+  chatIds: string[]
 }
 
-export function ChatList({ messages }: ChatListProps) {
+export function ChatList({ chatIds, currentId }: ChatListProps) {
+  const [titles, setTitles] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const loadTitles = () => {
+      const updated: Record<string, string> = {}
+      chatIds.forEach((id) => {
+        try {
+          const raw = localStorage.getItem(id)
+          const messages = raw ? JSON.parse(raw) : []
+          const firstUserMsg = messages.find(
+            (m: any) => m.role === 'user' && m.content
+          )
+          updated[id] =
+            firstUserMsg?.content?.slice(0, 30) || 'Untitled Chat'
+        } catch {
+          updated[id] = 'Untitled Chat'
+        }
+      })
+      setTitles(updated)
+    }
+
+    loadTitles()
+
+    // Optionally: auto-refresh titles every few seconds
+    const interval = setInterval(loadTitles, 3000)
+    return () => clearInterval(interval)
+  }, [chatIds])
+
   return (
-    <div className="flex flex-col space-y-4 p-4">
-      {messages.length === 0 && (
-        <p className="text-sm text-gray-400 text-center">No messages yet</p>
-      )}
-      {messages.map((message) => (
-        <ChatMessage
-          key={message.id}
-          message={message}
-        />
+    <ul className="space-y-1">
+      {chatIds.map((id) => (
+        <li key={id}>
+          <Link
+            href={`/chat/${id}`}
+            className={cn(
+              'block px-4 py-2 rounded hover:bg-muted transition',
+              currentId === id ? 'bg-muted font-bold' : ''
+            )}
+          >
+            {titles[id] || 'Loading...'}
+          </Link>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
