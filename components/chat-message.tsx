@@ -1,36 +1,23 @@
-import { useLocalStorage } from '@/lib/hooks/use-local-storage'
+'use client'
 
-export interface Chat {
-  id: string
-  title: string
+import ChatMessage from '@/components/chat-message' // ✅ default import
+import { useChatMessages } from '@/lib/hooks/use-chat-messages'
+
+interface ChatListProps {
+  chatId: string
 }
 
-export interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  createdAt: string
-}
+export function ChatList({ chatId }: ChatListProps) {
+  const { messages } = useChatMessages(chatId)
 
-export function useChatMessages() {
-  const [messages, setMessages] = useLocalStorage<Message[]>('chat-messages', [])
-  const [chats, setChats] = useLocalStorage<Chat[]>('chat-history', [])
-
-  const addMessage = (msg: Omit<Message, 'id' | 'createdAt'>) => {
-    const newMessage: Message = {
-      ...msg,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-    }
-    setMessages(prev => [...prev, newMessage])
-  }
-
-  const clearMessages = () => setMessages([])
-
-  return {
-    messages,
-    chats, // ✅ make sure this is returned
-    addMessage,
-    clearMessages,
-  }
+  return (
+    <div className="flex flex-col space-y-4 p-4">
+      {messages.length === 0 && (
+        <p className="text-sm text-gray-400 text-center">No messages yet</p>
+      )}
+      {messages.map((message) => (
+        <ChatMessage key={message.id} message={message} />
+      ))}
+    </div>
+  )
 }
