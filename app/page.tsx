@@ -17,5 +17,11 @@ export default function Page() {
     return <div className="p-4 text-center text-lg">Loading chat...</div>
   }
 
-  return <Chat id={id} />
+  // Ensure that the Chat component is only rendered once the ID is set
+  return (
+    <div>
+      {/* You can add more conditional rendering or state checks if necessary */}
+      <Chat id={id} />
+    </div>
+  )
 }
