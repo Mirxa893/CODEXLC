@@ -15,9 +15,14 @@ export const metadata = {
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen md:flex-row">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Sidebar */}
       <Sidebar />
-      <main className="flex-1 p-4 bg-muted/50">{children}</main>
+      
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 bg-gray-100 dark:bg-gray-800 text-white">
+        {children}
+      </main>
     </div>
   )
 }
